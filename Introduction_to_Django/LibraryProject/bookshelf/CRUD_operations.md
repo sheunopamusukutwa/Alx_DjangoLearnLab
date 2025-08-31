@@ -20,10 +20,10 @@ book
 from bookshelf.models import Book
 
 # Retrieve the book we just created
-b = Book.objects.get(title="1984", author="George Orwell", publication_year=1949)
+book = Book.objects.get(title="1984", author="George Orwell", publication_year=1949)
 
 # Show all attributes
-b.id, b.title, b.author, b.publication_year
+book.id, b.title, b.author, b.publication_year
 # Expected output (id will vary):
 # (1, '1984', 'George Orwell', 1949)
 
@@ -38,9 +38,9 @@ b.id, b.title, b.author, b.publication_year
 from bookshelf.models import Book
 
 # Get the existing book and update its title
-b = Book.objects.get(title="1984", author="George Orwell", publication_year=1949)
-b.title = "Nineteen Eighty-Four"
-b.save()
+book = Book.objects.get(title="1984", author="George Orwell", publication_year=1949)
+book.title = "Nineteen Eighty-Four"
+book.save()
 
 # Confirm the update
 Book.objects.get(id=b.id).title
@@ -58,8 +58,8 @@ Book.objects.get(id=b.id).title
 from bookshelf.models import Book
 
 # Get and delete the updated book
-b = Book.objects.get(title="Nineteen Eighty-Four", author="George Orwell", publication_year=1949)
-b.delete()
+book = Book.objects.get(title="Nineteen Eighty-Four", author="George Orwell", publication_year=1949)
+book.delete()
 # Expected output (row counts may vary):
 # (1, {'bookshelf.Book': 1})
 
