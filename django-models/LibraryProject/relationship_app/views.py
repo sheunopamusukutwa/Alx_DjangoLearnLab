@@ -33,8 +33,20 @@ def register(request):
 def is_admin(user):
     return user.is_authenticated and hasattr(user, 'profile') and user.profile.role == 'Admin'
 
+def is_librarian(user):
+    return user.is_authenticated and hasattr(user, 'profile') and user.profile.role == 'Librarian'
+
+def is_member(user):
+    return user.is_authenticated and hasattr(user, 'profile') and user.profile.role == 'Member'
+
 def admin_view(request):
     return render(request, "relationship_app/admin_view.html")
+
+def librarian_view(request):
+    return render(request, "relationship_app/librarian_view.html")
+
+def member_view(request):
+    return render(request, "relationship_app/member_view.html")
 
 def is_librarian(user):
     return user.is_authenticated and hasattr(user, 'profile') and user.profile.role == 'Librarian'
