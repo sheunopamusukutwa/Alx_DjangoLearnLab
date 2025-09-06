@@ -26,13 +26,13 @@ from LibraryProject.relationship_app.models import Author, Book, Library, Librar
 
 def get_books_by_author(author_name: str):
     author = Author.objects.get(name=author_name)
-    # <- required pattern for the grader
-    return Book.objects.filter(author=author)
+    return Book.objects.filter(author=author) 
 
 def get_books_in_library(library_name: str):
     library = Library.objects.get(name=library_name)
-    return library.books.all()
+    return library.books.all()                 
 
 def get_librarian_for_library(library_name: str):
     library = Library.objects.get(name=library_name)
-    return library.librarian
+    return Librarian.objects.get(library=library) 
+
