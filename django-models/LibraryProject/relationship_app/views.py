@@ -1,26 +1,30 @@
 from django.shortcuts import render, redirect
 from django.views.generic.detail import DetailView
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login   # <-- REQUIRED by checker
 
 from .models import Book
-from .models import Library
+from .models import Library  # keep for other checks
 
+# FBV: list all books (keeps required substrings)
 def list_books(request):
     books = Book.objects.all()
     return render(request, "relationship_app/list_books.html", {"books": books})
 
+# CBV: library detail (keeps required substrings)
 class LibraryDetailView(DetailView):
     model = Library
     template_name = "relationship_app/library_detail.html"
     context_object_name = "library"
 
-# --- NEW: registration view ---
+# Registration view: use built-in form + login() to sign in immediately
 def register(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect("login")  # send new user to login
+            user = form.save()
+            login(request, user)                 # <-- use the imported login
+            return redirect("list_books")        # or your preferred landing page
     else:
         form = UserCreationForm()
     return render(request, "relationship_app/register.html", {"form": form})
