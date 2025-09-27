@@ -10,10 +10,10 @@ from .models import Book, Library
 # FBV: list all books
 @login_required
 @permission_required('bookshelf.can_view_book', raise_exception=True)
-def list_books(request):
+def book_list(request):
     """List all books (requires can_view_book permission)."""
     books = Book.objects.all()
-    return render(request, "bookshelf/list_books.html", {"books": books})
+    return render(request, "bookshelf/book_list.html", {"books": books})
 
 
 # CBV: library detail
@@ -30,7 +30,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)  # auto-login after registration
-            return redirect("list_books")
+            return redirect("book_list")
     else:
         form = UserCreationForm()
     return render(request, "bookshelf/register.html", {"form": form})
@@ -75,7 +75,7 @@ def add_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect("list_books")
+            return redirect("book_list")
     else:
         form = BookForm()
     return render(request, "bookshelf/book_form.html", {"form": form, "action": "Add"})
@@ -90,7 +90,7 @@ def edit_book(request, pk):
         form = BookForm(request.POST, instance=book)
         if form.is_valid():
             form.save()
-            return redirect("list_books")
+            return redirect("book_list")
     else:
         form = BookForm(instance=book)
     return render(request, "bookshelf/book_form.html", {"form": form, "action": "Edit"})
@@ -103,5 +103,5 @@ def delete_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
     if request.method == "POST":
         book.delete()
-        return redirect("list_books")
+        return redirect("book_list")
     return render(request, "bookshelf/book_confirm_delete.html", {"book": book})
