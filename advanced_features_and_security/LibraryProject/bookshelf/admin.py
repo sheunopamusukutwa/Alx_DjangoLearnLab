@@ -8,10 +8,10 @@ class CustomUserAdmin(UserAdmin):
     list_display = ["username", "email", "role", "is_staff", "is_active"]
     list_filter = ["role", "is_staff", "is_active"]
     fieldsets = UserAdmin.fieldsets + (
-        (None, {"fields": ("role",)}),
+        (None, {"fields": ("date_of_birth", "profile_photo", "role")}),
     )
     add_fieldsets = UserAdmin.add_fieldsets + (
-        (None, {"fields": ("role",)}),
+        (None, {"fields": ("date_of_birth", "profile_photo", "role")}),
     )
     search_fields = ["username", "email"]
     ordering = ["username"]

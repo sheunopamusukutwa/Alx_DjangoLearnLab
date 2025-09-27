@@ -38,14 +38,15 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractUser):
-    """Extend Django's default user with DOB & profile photo."""
-    date_of_birth = models.DateField(_("date of birth"), null=True, blank=True)
-    profile_photo = models.ImageField(
-        _("profile photo"),
-        upload_to="profiles/",
-        null=True,
-        blank=True
+    date_of_birth = models.DateField(null=True, blank=True)
+    profile_photo = models.ImageField(upload_to="profiles/", null=True, blank=True)
+
+    ROLE_CHOICES = (
+        ("Admin", "Admin"),
+        ("Librarian", "Librarian"),
+        ("Member", "Member"),
     )
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="Member")
 
     objects = CustomUserManager()
 
@@ -68,7 +69,7 @@ class Author(models.Model):
 
 class Book(models.Model):
     title = models.CharField(max_length=255)
-    # ForeignKey → one Author has many Books
+    # ForeignKey: one Author has many Books
     author = models.ForeignKey(
         Author,
         on_delete=models.CASCADE,
@@ -81,11 +82,12 @@ class Book(models.Model):
             models.Index(fields=["title"]),
         ]
         # Custom permissions (in addition to Django’s built-ins add/change/delete/view)
-        permissions = (
-            ("can_add_book", "Can add book"),
-            ("can_change_book", "Can change book"),
-            ("can_delete_book", "Can delete book"),
-        )
+        permissions = [
+            ("can_view", "Can view book"),
+            ("can_create", "Can create book"),
+            ("can_edit", "Can edit book"),
+            ("can_delete", "Can delete book"),
+        ]
 
     def __str__(self) -> str:
         return f"{self.title} — {self.author.name}"
