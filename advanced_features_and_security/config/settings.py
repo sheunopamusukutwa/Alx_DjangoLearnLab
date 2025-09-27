@@ -31,11 +31,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     # Your custom app
-    "LibraryProject.relationship_app",
+    "LibraryProject.bookshelf",
 ]
 
-# Custom user model (from relationship_app/models.py)
-AUTH_USER_MODEL = "relationship_app.CustomUser"
+# Custom user model (from bookshelf/models.py)
+AUTH_USER_MODEL = "bookshelf.CustomUser"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
