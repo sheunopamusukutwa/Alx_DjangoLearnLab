@@ -7,70 +7,81 @@ from django import forms
 from .models import Book, Library
 
 
-# FBV: list all books
+# -------------------------
+# BOOK LIST (requires view permission)
+# -------------------------
 @login_required
-@permission_required('bookshelf.can_view_book', raise_exception=True)
+@permission_required('bookshelf.can_view', raise_exception=True)
 def book_list(request):
-    """List all books (requires can_view_book permission)."""
-    books = Book.objects.all()
+    """List all books — requires can_view permission."""
+    books = Book.objects.all()  # ORM = safe query (no SQL injection risk)
     return render(request, "bookshelf/book_list.html", {"books": books})
 
 
-# CBV: library detail
+# -------------------------
+# LIBRARY DETAIL VIEW
+# -------------------------
 class LibraryDetailView(DetailView):
+    """Detail view for a single library."""
     model = Library
     template_name = "bookshelf/library_detail.html"
     context_object_name = "library"
 
 
-# Registration view: use built-in form + login() to sign in immediately
+# -------------------------
+# USER REGISTRATION
+# -------------------------
 def register(request):
+    """Register a new user and auto-login."""
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # auto-login after registration
+            login(request, user)  # auto-login
             return redirect("book_list")
     else:
         form = UserCreationForm()
     return render(request, "bookshelf/register.html", {"form": form})
 
 
-# --- ROLE-BASED VIEWS (restricted by group permissions) ---
-
+# -------------------------
+# ROLE DASHBOARDS
+# -------------------------
 @login_required
-@permission_required('bookshelf.can_view_book', raise_exception=True)
+@permission_required('bookshelf.can_view', raise_exception=True)
 def admin_view(request):
-    """Admin dashboard view — only accessible with view permission."""
+    """Admin dashboard view — requires can_view permission."""
     return render(request, "bookshelf/admin_view.html")
 
 
 @login_required
-@permission_required('bookshelf.can_edit_book', raise_exception=True)
+@permission_required('bookshelf.can_edit', raise_exception=True)
 def librarian_view(request):
-    """Librarian dashboard view — requires edit permission."""
+    """Librarian dashboard view — requires can_edit permission."""
     return render(request, "bookshelf/librarian_view.html")
 
 
 @login_required
-@permission_required('bookshelf.can_view_book', raise_exception=True)
+@permission_required('bookshelf.can_view', raise_exception=True)
 def member_view(request):
-    """Member dashboard view — requires view permission."""
+    """Member dashboard view — requires can_view permission."""
     return render(request, "bookshelf/member_view.html")
 
 
-# --- BOOK FORMS (restricted by permissions) ---
-
+# -------------------------
+# BOOK MANAGEMENT FORMS
+# -------------------------
 class BookForm(forms.ModelForm):
+    """Form for creating and editing books."""
     class Meta:
         model = Book
         fields = ["title", "author"]
 
 
 @login_required
-@permission_required('bookshelf.can_create_book', raise_exception=True)
+@permission_required('bookshelf.can_create', raise_exception=True)
 def add_book(request):
-    """Add a new book — requires can_create_book permission."""
+    """Add a new book — requires can_create permission."""
     if request.method == "POST":
         form = BookForm(request.POST)
         if form.is_valid():
@@ -82,9 +93,9 @@ def add_book(request):
 
 
 @login_required
-@permission_required('bookshelf.can_edit_book', raise_exception=True)
+@permission_required('bookshelf.can_edit', raise_exception=True)
 def edit_book(request, pk):
-    """Edit an existing book — requires can_edit_book permission."""
+    """Edit an existing book — requires can_edit permission."""
     book = get_object_or_404(Book, pk=pk)
     if request.method == "POST":
         form = BookForm(request.POST, instance=book)
@@ -97,9 +108,9 @@ def edit_book(request, pk):
 
 
 @login_required
-@permission_required('bookshelf.can_delete_book', raise_exception=True)
+@permission_required('bookshelf.can_delete', raise_exception=True)
 def delete_book(request, pk):
-    """Delete a book — requires can_delete_book permission."""
+    """Delete a book — requires can_delete permission."""
     book = get_object_or_404(Book, pk=pk)
     if request.method == "POST":
         book.delete()

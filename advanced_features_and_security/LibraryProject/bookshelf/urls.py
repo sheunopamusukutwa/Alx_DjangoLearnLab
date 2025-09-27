@@ -1,12 +1,12 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
 from . import views
-from .views import list_books, LibraryDetailView
+from .views import book_list, LibraryDetailView
 
 app_name = "bookshelf"
 
 urlpatterns = [
-    path("books/", list_books, name="list_books"),
+    path("books/", book_list, name="book_list"),
     path("libraries/<int:pk>/", LibraryDetailView.as_view(), name="library_detail"),
 
     # Role-based views
