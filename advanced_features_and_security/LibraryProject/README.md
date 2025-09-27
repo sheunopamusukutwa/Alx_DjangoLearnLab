@@ -18,3 +18,9 @@ Configured in Django Admin:
 ## Enforcement
 Views use `@permission_required` decorators to check permissions.
 Example: `@permission_required('bookshelf.can_edit')` protects the edit view.
+
+SECURE_SSL_REDIRECT=True forces HTTPS.
+HSTS (SECURE_HSTS_*) instructs browsers to always use HTTPS (and allows preloading).
+SESSION_COOKIE_SECURE / CSRF_COOKIE_SECURE ensure cookies travel only over HTTPS.
+X_FRAME_OPTIONS="DENY" and SECURE_CONTENT_TYPE_NOSNIFF=True harden against clickjacking and MIME sniffing.
+Use SECURE_PROXY_SSL_HEADER when Django sits behind a TLS-terminating proxy.
