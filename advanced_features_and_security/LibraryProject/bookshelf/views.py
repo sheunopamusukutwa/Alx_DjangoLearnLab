@@ -5,6 +5,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required, permission_required
 from django import forms
 from .models import Book, Library
+from .forms import ExampleForm   # <-- Import ExampleForm
 
 
 # -------------------------
@@ -116,3 +117,30 @@ def delete_book(request, pk):
         book.delete()
         return redirect("book_list")
     return render(request, "bookshelf/book_confirm_delete.html", {"book": book})
+
+
+# -------------------------
+# EXAMPLE FORM VIEW (Step 2 - Security Best Practices)
+# -------------------------
+@login_required
+def example_form_view(request):
+    """
+    Example form view that demonstrates CSRF protection,
+    safe form handling, and input sanitization.
+    """
+    if request.method == "POST":
+        form = ExampleForm(request.POST)
+        if form.is_valid():
+            # Safely access sanitized data
+            name = form.cleaned_data["name"]
+            email = form.cleaned_data["email"]
+            message = form.cleaned_data["message"]
+            return render(request, "bookshelf/form_example.html", {
+                "form": form,
+                "success": True,
+                "name": name,
+            })
+    else:
+        form = ExampleForm()
+
+    return render(request, "bookshelf/form_example.html", {"form": form})
