@@ -25,3 +25,11 @@ The `/api/books/` endpoint supports advanced querying:
 - **Ordering** by title or publication year:
   - `/api/books/?ordering=title`
   - `/api/books/?ordering=-publication_year`
+
+## Testing the API
+
+Tests are located in `api/test_views.py`.
+
+### Run tests
+```bash
+python manage.py test api
