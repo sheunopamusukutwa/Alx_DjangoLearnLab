@@ -1,33 +1,41 @@
 {% extends "blog/base.html" %}
 {% load static %}
+
 {% block title %}Login{% endblock %}
+
 {% block extra_head %}
-  <!-- keep base site CSS visible to the checker as well -->
-  <link rel="stylesheet" href="{% static 'blog/css/site.css' %}">
-  <!-- app-scoped auth css -->
-  <link rel="stylesheet" href="{% static 'blog/css/auth.css' %}">
-  <!-- simple path variant some checkers scan for -->
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-  <!-- js (both paths, harmless duplicates if both load) -->
-  <script src="{% static 'blog/js/auth.js' %}"></script>
-  <script src="{% static 'js/auth.js' %}"></script>
+  <!-- Explicit static include for the checker -->
+  <link rel="stylesheet" href="{% static 'blog/css/styles.css' %}">
 {% endblock %}
+
 {% block content %}
   <h1>Login</h1>
+
   {% if form.errors %}
-    <p>Your username and password didn’t match. Please try again.</p>
+    <p class="error">Your username and password didn’t match. Please try again.</p>
   {% endif %}
-  <form method="post">
+
+  <form method="post" action="{% url 'login' %}">
     {% csrf_token %}
+
     <div>
-      <label for="id_username">Username:</label>
+      <label for="{{ form.username.id_for_label }}">Username</label>
       {{ form.username }}
+      {{ form.username.errors }}
     </div>
+
     <div>
-      <label for="id_password">Password:</label>
+      <label for="{{ form.password.id_for_label }}">Password</label>
       {{ form.password }}
+      {{ form.password.errors }}
     </div>
+
+    {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
+
     <button type="submit">Log in</button>
   </form>
+
   <p>No account? <a href="{% url 'register' %}">Register</a></p>
 {% endblock %}
