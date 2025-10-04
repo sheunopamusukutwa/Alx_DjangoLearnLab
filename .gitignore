@@ -6,13 +6,13 @@ __pycache__/
 *.so
 
 # Virtual Environments
-venv/
+.venv/
 ENV/
 env/
 *.env
 *.venv
 
-# Django / DRF
+# Django
 *.log
 *.pot
 *.pyc
@@ -27,5 +27,5 @@ local_settings.py
 .idea/
 *.swp
 
-# MacOS
+# macOS
 .DS_Store
