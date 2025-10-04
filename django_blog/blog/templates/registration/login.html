@@ -1,5 +1,10 @@
 {% extends "blog/base.html" %}
+{% load static %}
 {% block title %}Login{% endblock %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'blog/css/auth.css' %}">
+  <script src="{% static 'blog/js/auth.js' %}"></script>
+{% endblock %}
 {% block content %}
   <h1>Login</h1>
   {% if form.errors %}
