@@ -123,7 +123,9 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     template_name = "blog/comment_form.html"
 
     def dispatch(self, request, *args, **kwargs):
-        self.post_obj = get_object_or_404(Post, pk=self.kwargs["post_id"])
+        # Accept either /posts/<post_id>/comments/new/ OR /post/<pk>/comments/new/
+        post_id = kwargs.get("post_id") or kwargs.get("pk")
+        self.post_obj = get_object_or_404(Post, pk=post_id)
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -146,9 +148,9 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     form_class = CommentForm
     template_name = "blog/comment_form.html"
 
-    def get_queryset(self):
-        # restrict to correct post for safety
-        return Comment.objects.filter(post_id=self.kwargs["post_id"])
+    def get_object(self, queryset=None):
+        # Works for both /posts/<post_id>/comments/<pk>/edit/ and /comment/<pk>/update/
+        return get_object_or_404(Comment, pk=self.kwargs["pk"])
 
     def test_func(self):
         return self.get_object().author == self.request.user
@@ -158,15 +160,21 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse("post-detail", kwargs={"pk": self.kwargs["post_id"]})
+        return reverse("post-detail", kwargs={"pk": self.object.post.pk})
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["post"] = self.object.post
+        return ctx
 
 
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
     template_name = "blog/comment_confirm_delete.html"
 
-    def get_queryset(self):
-        return Comment.objects.filter(post_id=self.kwargs["post_id"])
+    def get_object(self, queryset=None):
+        # Works for both /posts/<post_id>/comments/<pk>/delete/ and /comment/<pk>/delete/
+        return get_object_or_404(Comment, pk=self.kwargs["pk"])
 
     def test_func(self):
         return self.get_object().author == self.request.user
@@ -176,4 +184,4 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse("post-detail", kwargs={"pk": self.kwargs["post_id"]})
+        return reverse("post-detail", kwargs={"pk": self.object.post.pk})
