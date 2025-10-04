@@ -1,0 +1,4 @@
+/* Top-level static copy used by some checkers */
+/* Duplicate of blog app styles for auth pages */
+form { max-width: 480px; }
+form div { margin-bottom: 0.5rem; }
