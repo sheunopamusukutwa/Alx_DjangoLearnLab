@@ -1,0 +1,3 @@
+/* Auth-specific tweaks */
+form { max-width: 480px; }
+form div { margin-bottom: 0.5rem; }
