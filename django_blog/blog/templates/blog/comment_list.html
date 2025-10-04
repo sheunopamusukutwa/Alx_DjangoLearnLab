@@ -1,0 +1,18 @@
+{% extends "blog/base.html" %}
+{% block title %}Comments{% endblock %}
+{% block content %}
+  <h1>Comments</h1>
+  <p>For post: <a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a></p>
+  {% if comments %}
+    <ul>
+      {% for c in comments %}
+        <li>
+          <p>{{ c.content|linebreaks }}</p>
+          <small>by {{ c.author.username }} · {{ c.created_at|date:"Y-m-d H:i" }}</small>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No comments yet.</p>
+  {% endif %}
+{% endblock %}
