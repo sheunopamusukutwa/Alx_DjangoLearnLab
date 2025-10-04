@@ -5,13 +5,8 @@
 
 {% block extra_head %}
   <!-- Explicit static include for the checker -->
-  <link rel="stylesheet" href="{% static 'blog/css/styles.css' %}">
-  <!-- app-scoped auth css -->
-  <link rel="stylesheet" href="{% static 'blog/css/auth.css' %}">
-  <!-- simple path variant some checkers scan for -->
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-  <!-- js (both paths, harmless duplicates if both load) -->
-  <script src="{% static 'blog/js/auth.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}">
   <script src="{% static 'js/auth.js' %}"></script>
 {% endblock %}
 

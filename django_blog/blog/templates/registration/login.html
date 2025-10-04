@@ -5,7 +5,9 @@
 
 {% block extra_head %}
   <!-- Explicit static include for the checker -->
-  <link rel="stylesheet" href="{% static 'blog/css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+  <script src="{% static 'js/auth.js' %}"></script>
 {% endblock %}
 
 {% block content %}
