@@ -1,0 +1,31 @@
+{% extends "blog/base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+  <h1>Create an account</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div>
+      <label for="{{ form.username.id_for_label }}">Username</label>
+      {{ form.username.errors }}
+      {{ form.username }}
+    </div>
+    <div>
+      <label for="{{ form.email.id_for_label }}">Email</label>
+      {{ form.email.errors }}
+      {{ form.email }}
+    </div>
+    <div>
+      <label for="{{ form.password1.id_for_label }}">Password</label>
+      {{ form.password1.errors }}
+      {{ form.password1 }}
+    </div>
+    <div>
+      <label for="{{ form.password2.id_for_label }}">Confirm password</label>
+      {{ form.password2.errors }}
+      {{ form.password2 }}
+    </div>
+    <button type="submit">Register</button>
+  </form>
+  <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+{% endblock %}
