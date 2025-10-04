@@ -5,16 +5,28 @@
   <form method="post">
     {% csrf_token %}
     {{ form.non_field_errors }}
+
     <div>
       <label for="{{ form.title.id_for_label }}">Title</label>
       {{ form.title.errors }}
       {{ form.title }}
     </div>
+
     <div>
       <label for="{{ form.content.id_for_label }}">Content</label>
       {{ form.content.errors }}
       {{ form.content }}
     </div>
+
+    <div>
+      <label for="{{ form.tag_names.id_for_label }}">Tags</label>
+      {{ form.tag_names.errors }}
+      {{ form.tag_names }}
+      {% if form.fields.tag_names.help_text %}
+        <small>{{ form.fields.tag_names.help_text }}</small>
+      {% endif %}
+    </div>
+
     <button type="submit">{% if form.instance.pk %}Save Changes{% else %}Create Post{% endif %}</button>
   </form>
 {% endblock %}
