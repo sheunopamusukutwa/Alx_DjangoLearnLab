@@ -1,0 +1,5 @@
+The application's authentication system utilizes Django's built-in views and templates for the login and logout functionalities, accessible at the /login and /logout URLs. 
+For new users, a registration page is available at /register, which uses a custom RegisterForm to ensure that each email address is unique. 
+Once authenticated, users can manage their editable information on a profile page located at /profile, a view protected by the @login_required decorator. 
+To ensure security, all forms are safeguarded against Cross-Site Request Forgery attacks with the {% csrf_token %} tag, and passwords are securely stored using Django’s hashing framework, which defaults to the PBKDF2 algorithm. 
+To test the system, one should follow the happy-path steps for the four primary URLs: /login, /logout, /register, and /profile.
