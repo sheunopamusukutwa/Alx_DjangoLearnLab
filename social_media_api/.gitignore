@@ -1,0 +1,12 @@
+# Virtualenv
+.venv/
+# Python
+__pycache__/
+*.pyc
+# Django
+db.sqlite3
+media/
+staticfiles/
+# OS/editor
+.DS_Store
+.env
