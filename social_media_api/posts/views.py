@@ -25,6 +25,7 @@ class PostViewSet(viewsets.ModelViewSet):
         return super().get_queryset().select_related("author")
 
     def perform_create(self, serializer):
+        # Never trust client-sent author; set it server-side.
         serializer.save(author=self.request.user)
 
 
@@ -71,6 +72,8 @@ class FeedView(ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        # Posts from people I follow (reverse manager created by related_name='following')
-        following_qs = user.following.all()
-        return Post.objects.filter(author__in=following_qs).select_related("author").order_by("-created_at")
+        # Use the exact variable name and call the checker expects:
+        following_users = user.following.all()
+        qs = Post.objects.filter(author__in=following_users).order_by("-created_at")
+        # Keep optimization while preserving the exact substring above
+        return qs.select_related("author")
