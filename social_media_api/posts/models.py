@@ -1,9 +1,8 @@
 from django.conf import settings
 from django.db import models
 
-# Create your models here.
-
 User = settings.AUTH_USER_MODEL
+
 
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
@@ -13,7 +12,7 @@ class Post(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-created_at"]  # newest first
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"{self.title} (by {self.author})"
@@ -27,7 +26,22 @@ class Comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["created_at"]  # oldest first (thread-like)
+        ordering = ["created_at"]
 
     def __str__(self):
         return f"Comment by {self.author} on Post {self.post_id}"
+
+
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="likes")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="likes")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "post"], name="unique_user_post_like")
+        ]
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user} liked Post {self.post_id}"

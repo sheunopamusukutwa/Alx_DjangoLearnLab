@@ -1,8 +1,14 @@
-from rest_framework import viewsets, permissions, filters
+from rest_framework import viewsets, permissions, filters, status
 from rest_framework.generics import ListAPIView
-from .models import Post, Comment
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
 from .permissions import IsOwnerOrReadOnly
+
+# Notifications
+from notifications.models import Notification
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -21,11 +27,9 @@ class PostViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]
 
     def get_queryset(self):
-        # Keep performance optimization
         return super().get_queryset().select_related("author")
 
     def perform_create(self, serializer):
-        # Never trust client-sent author; set it server-side.
         serializer.save(author=self.request.user)
 
 
@@ -53,15 +57,71 @@ class CommentViewSet(viewsets.ModelViewSet):
         return qs
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        comment = serializer.save(author=self.request.user)
+        post = comment.post
+        # Notify the post author (avoid self-notifications)
+        if post.author_id != self.request.user.id:
+            Notification.objects.create(
+                recipient=post.author,
+                actor=self.request.user,
+                verb="commented on your post",
+                target=post,
+            )
+
+
+class PostLikeView(APIView):
+    """
+    POST /api/posts/<pk>/like/
+    Creates a like if not already liked; idempotent.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk: int):
+        try:
+            post = Post.objects.select_related("author").get(pk=pk)
+        except Post.DoesNotExist:
+            return Response({"detail": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
+
+        if created and post.author_id != request.user.id:
+            Notification.objects.create(
+                recipient=post.author,
+                actor=request.user,
+                verb="liked your post",
+                target=post,
+            )
+
+        return Response(
+            {"detail": "Liked" if created else "Already liked", "likes_count": post.likes.count()},
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+
+class PostUnlikeView(APIView):
+    """
+    POST /api/posts/<pk>/unlike/
+    Deletes the like if it exists; idempotent.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk: int):
+        try:
+            post = Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            return Response({"detail": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        deleted, _ = Like.objects.filter(user=request.user, post=post).delete()
+        return Response(
+            {"detail": "Unliked" if deleted else "Not liked", "likes_count": post.likes.count()},
+            status=status.HTTP_200_OK,
+        )
 
 
 class FeedView(ListAPIView):
     """
     /api/feed/
     Lists posts authored by users the current user follows, newest first.
-    Requires authentication.
-    Supports global pagination, search, ordering.
     """
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -72,8 +132,6 @@ class FeedView(ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        # Use the exact variable name and call the checker expects:
         following_users = user.following.all()
         qs = Post.objects.filter(author__in=following_users).order_by("-created_at")
-        # Keep optimization while preserving the exact substring above
         return qs.select_related("author")
